@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PersonDash</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="login-screen" class="screen visible">
+        <div class="login-box">
+            <h1>PersonDash</h1>
+            <p>Insira a senha dinâmica</p>
+            <input type="password" id="password-input" placeholder="****" />
+            <button id="login-button">Entrar</button>
+            <p id="login-error" class="error-msg" style="display: none;">Senha Incorreta</p>
+        </div>
+    </div>
+
+    <div id="dashboard-screen" class="screen hidden">
+        <div class="header">
+            <h1 id="clock-display">00:00:00</h1>
+            <p id="date-display">Carregando data...</p>
+            <div class="pills-container" id="pills-container">
+                <span class="pill" id="pill-diaano">Ano: --</span>
+                <span class="pill" id="pill-semana">Sem: --</span>
+                <span class="pill" id="pill-restante">Faltam: --</span>
+                <span class="pill" id="pill-lua">Lua: --</span>
+            </div>
+        </div>
+        
+        <div class="widgets-container">
+            
+            <!-- Clima (Superior Esquerdo) -->
+            <div class="widget weather-widget">
+                <h2>Clima de Campinas <button class="btn-refresh" id="btn-refresh-weather">↻</button></h2>
+                <p id="weather-timestamp" class="timestamp-txt">Última att: --:--</p>
+                <div class="weather-info">
+                    <div id="weather-icon" class="w-icon"></div>
+                    <div class="w-main">
+                        <span id="temp-display" class="temp">--°C</span>
+                        <span id="weather-cond" class="condition">Buscando...</span>
+                    </div>
+                </div>
+                <div class="w-extras">
+                    <span id="w-humidity">💧 -%</span>
+                    <span id="w-wind">🌬️ - km/h</span>
+                </div>
+                <div class="weather-week-forecast" id="weather-week-container">
+                    <p style="text-align:center;color:#888;">Renderizando semana completa...</p>
+                </div>
+            </div>
+
+            <!-- Notícias GRID Visual (Superior Direito) -->
+            <div class="widget news-widget">
+                <h2>Notícias <button class="btn-refresh" id="btn-refresh-news">↻</button></h2>
+                <div class="news-grid" id="news-grid">
+                    <p style="text-align:center; padding-top:40px; color:#aaa;">Puxando portal G1...</p>
+                </div>
+            </div>
+
+            <!-- Esportes Ampliado (Abaixo cobrindo tudo) -->
+            <div class="widget widget-full sports-widget">
+                <h2>Acompanhar Esportes <span style="font-size:12px;color:#888;">(Atualizado Hoje)</span></h2>
+                <div class="scroll-area sports-scroll">
+                    
+                    <div class="league-box nfl-box">
+                        <h3 class="league-title">🏈 NFL</h3>
+                        <div id="nfl-container" class="sports-list">Buscando jogos...</div>
+                    </div>
+
+                    <div class="league-box nhl-box">
+                        <h3 class="league-title">🏒 NHL</h3>
+                        <div id="nhl-container" class="sports-list">Buscando jogos...</div>
+                    </div>
+                    
+                    <div class="league-box mlb-box">
+                        <h3 class="league-title">⚾ MLB</h3>
+                        <div id="mlb-container" class="sports-list">Buscando jogos...</div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
