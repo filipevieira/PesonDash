@@ -27,6 +27,17 @@ function tentarLogin() {
     }
 }
 
+var btnFs = document.getElementById('btn-fullscreen');
+if (btnFs) {
+    btnFs.onclick = function() {
+        var doc = document.documentElement;
+        if (doc.requestFullscreen) { doc.requestFullscreen(); }
+        else if (doc.webkitRequestFullScreen) { doc.webkitRequestFullScreen(); }
+        else if (doc.msRequestFullscreen) { doc.msRequestFullscreen(); }
+        this.style.color = '#00ffcc'; // sinaliza ativado
+    };
+}
+
 // ------ MATEMATICA CRONOLOGICA ------
 function calcularInfoHeader() {
     var hoje = new Date();
@@ -101,23 +112,16 @@ function carregarClima() {
     );
 }
 
-// ------ NOTICIAS G1 (GRID 3x2 com Card Images) ------
+// ------ NOTICIAS G1 (LISTA EXPRESSA 6 LINKS) ------
 function carregarNoticias() {
-    document.getElementById('news-grid').innerHTML = "<p style='text-align:center; padding-top:40px; color:#aaa;'>Puxando portal G1...</p>";
+    document.getElementById('news-list').innerHTML = "<li><p style='color:#aaa;'>Puxando G1...</p></li>";
     request("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent("https://g1.globo.com/rss/g1/sp/campinas-regiao/"), function(){}, function(d){
         if(d && d.items) {
             var html = "";
-            for(var i=0; i<3 && i<d.items.length; i++) {
-                var m = d.items[i];
-                var imgUrl = m.thumbnail || (m.enclosure ? m.enclosure.link : "") || "";
-                var bgCss = imgUrl ? "background-image: url('"+imgUrl+"');" : "background-color: #222;";
-                
-                html += "<a href='"+m.link+"' target='_blank' class='news-card'>";
-                html += "  <div class='news-img' style=\"" + bgCss + "\"></div>";
-                html += "  <p class='news-txt'>"+m.title+"</p>";
-                html += "</a>";
+            for(var i=0; i<6 && i<d.items.length; i++) {
+                html += "<li><a href='"+d.items[i].link+"' target='_blank'>"+d.items[i].title+"</a></li>";
             }
-            document.getElementById('news-grid').innerHTML = html;
+            document.getElementById('news-list').innerHTML = html;
         }
     });
 }

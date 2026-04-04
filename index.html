@@ -18,24 +18,39 @@
         </div>
     </div>
 
+    <!-- TELA CHEIA ATRAVÉS DO REQUESTFULLSCREEN -->
     <div id="dashboard-screen" class="screen hidden">
-        <div class="header">
-            <h1 id="clock-display">00:00:00</h1>
-            <p id="date-display">Carregando data...</p>
-            <div class="pills-container" id="pills-container">
-                <span class="pill" id="pill-diaano">Ano: --</span>
-                <span class="pill" id="pill-semana">Sem: --</span>
-                <span class="pill" id="pill-restante">Faltam: --</span>
-                <span class="pill" id="pill-lua">Lua: --</span>
-            </div>
-        </div>
-        
         <div class="widgets-container">
             
-            <!-- Clima (Superior Esquerdo) -->
+            <!-- (0,0) BLOCO: CENTRAL DO TEMPO -->
+            <div class="widget time-widget">
+                <button id="btn-fullscreen" class="btn-fs" title="Tela Cheia">⛶</button>
+                <div class="time-wrapper">
+                    <h1 id="clock-display">00:00:00</h1>
+                    <p id="date-display">Carregando...</p>
+                </div>
+                
+                <div class="pills-container" id="pills-container">
+                    <span class="pill" id="pill-diaano">Ano: --</span>
+                    <span class="pill" id="pill-semana">Sem: --</span>
+                    <span class="pill" id="pill-restante">Faltam: --</span>
+                    <span class="pill" id="pill-lua">Lua: --</span>
+                </div>
+            </div>
+
+            <!-- (0,1) BLOCO: NOTÍCIAS RAPIDAS -->
+            <div class="widget news-widget">
+                <h2>Notícias <button class="btn-refresh" id="btn-refresh-news">↻</button></h2>
+                <div class="scroll-area flex-height">
+                    <ul id="news-list" class="news-list">
+                        <li><p style="color:#aaa;">Puxando G1...</p></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- (0,2) BLOCO: CLIMA METEOROLÓGICO -->
             <div class="widget weather-widget">
-                <h2>Clima de Campinas <button class="btn-refresh" id="btn-refresh-weather">↻</button></h2>
-                <p id="weather-timestamp" class="timestamp-txt">Última att: --:--</p>
+                <h2>Clima Local <button class="btn-refresh" id="btn-refresh-weather">↻</button></h2>
                 <div class="weather-info">
                     <div id="weather-icon" class="w-icon"></div>
                     <div class="w-main">
@@ -47,39 +62,33 @@
                     <span id="w-humidity">💧 -%</span>
                     <span id="w-wind">🌬️ - km/h</span>
                 </div>
+                <!-- Previsao da Semana (Ocupa o rodapé do Bloco) -->
                 <div class="weather-week-forecast" id="weather-week-container">
-                    <p style="text-align:center;color:#888;">Renderizando semana completa...</p>
+                    <p style="text-align:center;color:#888;">--</p>
                 </div>
             </div>
 
-            <!-- Notícias GRID Visual (Superior Direito) -->
-            <div class="widget news-widget">
-                <h2>Notícias <button class="btn-refresh" id="btn-refresh-news">↻</button></h2>
-                <div class="news-grid" id="news-grid">
-                    <p style="text-align:center; padding-top:40px; color:#aaa;">Puxando portal G1...</p>
+            <!-- (1,0) BLOCO: NFL -->
+            <div class="widget sports-panel">
+                <h2 class="league-title">🏈 NFL <span style="font-size:11px;color:#666;">(Hoje)</span></h2>
+                <div class="scroll-area flex-height">
+                    <div id="nfl-container" class="sports-list"><p style="color:#888;">Procurando partidas...</p></div>
+                </div>
+            </div>
+            
+            <!-- (1,1) BLOCO: NHL -->
+            <div class="widget sports-panel">
+                <h2 class="league-title">🏒 NHL <span style="font-size:11px;color:#666;">(Hoje)</span></h2>
+                <div class="scroll-area flex-height">
+                    <div id="nhl-container" class="sports-list"><p style="color:#888;">Procurando partidas...</p></div>
                 </div>
             </div>
 
-            <!-- Esportes Ampliado (Abaixo cobrindo tudo) -->
-            <div class="widget widget-full sports-widget">
-                <h2>Acompanhar Esportes <span style="font-size:12px;color:#888;">(Atualizado Hoje)</span></h2>
-                <div class="scroll-area sports-scroll">
-                    
-                    <div class="league-box nfl-box">
-                        <h3 class="league-title">🏈 NFL</h3>
-                        <div id="nfl-container" class="sports-list">Buscando jogos...</div>
-                    </div>
-
-                    <div class="league-box nhl-box">
-                        <h3 class="league-title">🏒 NHL</h3>
-                        <div id="nhl-container" class="sports-list">Buscando jogos...</div>
-                    </div>
-                    
-                    <div class="league-box mlb-box">
-                        <h3 class="league-title">⚾ MLB</h3>
-                        <div id="mlb-container" class="sports-list">Buscando jogos...</div>
-                    </div>
-                    
+            <!-- (1,2) BLOCO: MLB -->
+            <div class="widget sports-panel">
+                <h2 class="league-title">⚾ MLB <span style="font-size:11px;color:#666;">(Hoje)</span></h2>
+                <div class="scroll-area flex-height">
+                    <div id="mlb-container" class="sports-list"><p style="color:#888;">Procurando partidas...</p></div>
                 </div>
             </div>
             
