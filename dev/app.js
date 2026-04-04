@@ -279,14 +279,39 @@ function carregarLigaESPN(ligaCaminho, containerId, sportKey) {
     
     var offset = sportDatesOffset[sportKey] || 0;
     var suffix = "?lang=pt&region=br";
+    var endpoint = "scoreboard";
     if (offset !== 0) { suffix += "&dates=" + formatterESPN_Date(offset); }
+    
+    // Custom F1 endpoint if it's Formula 1 and no offset (just get Standings)
+    if (sportKey === 'f1') {
+        endpoint = "standings";
+        suffix = "";
+    }
 
-    request("https://site.api.espn.com/apis/site/v2/sports/" + ligaCaminho + "/scoreboard" + suffix, 
+    request("https://site.api.espn.com/apis/site/v2/sports/" + ligaCaminho + "/" + endpoint + suffix, 
         function() { var el=document.getElementById(containerId); if(el) el.innerHTML = "<p style='padding:10px;'>Off</p>"; }, 
         function(d) {
             var el = document.getElementById(containerId); if(!el) return;
+            var html = "";
+            
+            // --- MOTOR ESPECIAL: FORMULA 1 STANDINGS ---
+            if (sportKey === 'f1') {
+                try {
+                    var rank = d.children[0].standings.entries;
+                    for(var f=0; f<rank.length && f<8; f++) {
+                        var f1Athelete = rank[f].athlete.displayName;
+                        var pts = rank[f].stats[0].displayValue;
+                        html += "<div class='sport-row' style='display:flex; justify-content:space-between;'>";
+                        html += "  <span style='color:#ccc;'><b style='color:#00ffcc;'>"+(f+1)+"º</b> " + f1Athelete + "</span>";
+                        html += "  <span style='color:#fff; font-weight:bold;'>" + pts + " pts</span>";
+                        html += "</div>";
+                    }
+                    el.innerHTML = html !== "" ? html : "<p style='padding:10px;'>Grid vazio.</p>";
+                } catch(e) { el.innerHTML = "<p style='padding:10px;'>Grid indisponível.</p>"; }
+                return;
+            }
+            
             if(d && d.events && d.events.length > 0) {
-                var html = "";
                 
                 // --- MOTOR ESPECIAL PARA GOLF (LEADERBOARDS) ---
                 if (ligaCaminho === 'golf/pga') {
@@ -365,11 +390,14 @@ function carregarLigaESPN(ligaCaminho, containerId, sportKey) {
                         }
                         
                         // Abastece Faixa Amarela (Últimos Lances se tiver Ao Vivo)
+                        var shortIcn = SPORTS_MAP[sportKey].name.split(' ')[0];
                         if (offset === 0 && jogo.status.type.state === 'in') {
                             if (jogo.situation && jogo.situation.lastPlay && jogo.situation.lastPlay.text) {
-                                var shortIcn = SPORTS_MAP[sportKey].name.split(' ')[0];
                                 window.LIVE_PLAYS_DATA.push(shortIcn + " " + nm2 + " vs " + nm1 + " [" + jogo.situation.lastPlay.text + "]");
                             }
+                        } else if (offset === 0 && isPost) {
+                            // Se nao ta rolando ao vivo, popula yellow box com finais
+                            window.LIVE_PLAYS_DATA.push(shortIcn + " FIM: " + nm2 + " " + score2Val + " x " + score1Val + " " + nm1);
                         }
                     } catch(e) {}
                 }
