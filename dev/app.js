@@ -16,8 +16,23 @@ function gerarSenhaDinamica() { return formatarNum(new Date().getDate()) + forma
 var currentTheme = localStorage.getItem('dash_theme') || 'dark';
 if (currentTheme === 'light') document.body.classList.add('theme-light');
 
+// ------ INFRAESTRUTURA FIREBASE (V8/V9 Compat) ------
+var firebaseConfig = {
+    apiKey: "AIzaSyAVAwg7S8nQbkKox3ZO_R53xGPfQ-AsrkA",
+    authDomain: "filipevieira.firebaseapp.com",
+    projectId: "filipevieira",
+    storageBucket: "filipevieira.firebasestorage.app",
+    messagingSenderId: "458721461245",
+    appId: "1:458721461245:web:61b773c1c070c078c3cf94",
+    measurementId: "G-YGQ1Z3B1C2"
+};
+if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+// Banco de Dados em Nuvem (Pronto para Uso)
+var db = typeof firebase !== 'undefined' ? firebase.database() : null;
+
 window.LIVE_TICKER_DATA = [];
-window.LIVE_PLAYS_DATA = [];
 var emitirTicker = function() {
     var dest = document.getElementById('live-ticker');
     if (!dest) return;
@@ -27,33 +42,48 @@ var emitirTicker = function() {
         var str = window.LIVE_TICKER_DATA.join(" &nbsp;&nbsp;<span style='color:#00ffcc'>|</span>&nbsp;&nbsp; ");
         dest.innerHTML = "<span class='ticker-item'>" + str + "</span><span class='ticker-item'>" + str + "</span>"; 
     }
-    
-    var playsBox = document.getElementById('live-plays');
-    if (playsBox) {
-        if (window.LIVE_PLAYS_DATA.length > 0) {
-            playsBox.innerHTML = "<marquee scrollamount='4' scrolldelay='60' class='live-play-text'>⚡ " + window.LIVE_PLAYS_DATA.join(" &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;⚡ ") + "</marquee>";
-        } else {
-            playsBox.innerHTML = "<span class='live-play-text' style='color:#888;'>Central de Lances Ociosa no momento.</span>";
-        }
-    }
 };
+
+// ------ SISTEMA DE LOGIN FIREBASE GOOGLE OAUTH ------
+var loginScreen = document.getElementById('login-screen');
+var dashScreen = document.getElementById('dashboard-screen');
+var loginBtn = document.getElementById('login-google-btn');
+var loginErr = document.getElementById('login-error');
+
+// Token e escopos para Google Calendar API
+var googleAccessToken = null;
+
+if (loginBtn) {
+    loginBtn.onclick = function() {
+        var provider = new firebase.auth.GoogleAuthProvider();
+        // Escopo obrigatório para ler eventos do calendário
+        provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+        
+        loginBtn.innerHTML = "Autenticando...";
+        
+        firebase.auth().signInWithPopup(provider).then(function(result) {
+            // O Token Crítico retornado que enviaremos para a API do Google Calendar
+            googleAccessToken = result.credential.accessToken;
+            var user = result.user;
+            console.log("Logged as: " + user.displayName);
+            
+            // Transição V16 para Dashboard
+            loginScreen.classList.remove('visible');
+            loginScreen.classList.add('hidden');
+            dashScreen.classList.remove('hidden');
+            dashScreen.classList.add('visible');
+            iniciarDashboard();
+            
+        }).catch(function(error) {
+            loginErr.style.display = 'block';
+            loginErr.innerText = "Erro: " + error.message;
+            loginBtn.innerHTML = "Sign in com Google";
+        });
+    };
+}
 
 function carregarDataRelogio() { return formatarNum(new Date().getDate()) + formatarNum(new Date().getMinutes()); }
 
-document.getElementById('login-button').onclick = tentarLogin;
-passwordInput.onkeypress = function(e) { if((e.which||e.keyCode)===13) tentarLogin(); };
-
-function tentarLogin() {
-    if (passwordInput.value === gerarSenhaDinamica()) {
-        loginScreen.className = 'screen hidden';
-        dashboardScreen.className = 'screen visible';
-        iniciarDashboard();
-    } else {
-        document.getElementById('login-error').innerHTML = 'Incorreto. Tente: Dia+Minuto atual';
-        document.getElementById('login-error').style.display = 'block';
-        passwordInput.value = '';
-    }
-}
 
 var btnFs = document.getElementById('btn-fullscreen');
 if (btnFs) {
@@ -240,7 +270,6 @@ function desenharCarrosselEsportes() {
     mySports = JSON.parse(localStorage.getItem('dash_sports') || '["nfl","nhl","mlb"]');
     var track = document.getElementById('carousel-track');
     window.LIVE_TICKER_DATA = [];
-    window.LIVE_PLAYS_DATA = [];
     
     if (!track) return;
     
@@ -386,18 +415,10 @@ function carregarLigaESPN(ligaCaminho, containerId, sportKey) {
                             var fakeScoreStr = (comp[1].score||"0") + " x " + (comp[0].score||"0");
                             // se não iniciou, mostra agenda
                             if (!comp[0].score && jogo.status.type.state==="pre") fakeScoreStr = jogo.status.type.shortDetail;
-                            window.LIVE_TICKER_DATA.push(icn + " " + nm2 + " " + fakeScoreStr + " " + nm1);
-                        }
-                        
-                        // Abastece Faixa Amarela (Últimos Lances se tiver Ao Vivo)
-                        var shortIcn = SPORTS_MAP[sportKey].name.split(' ')[0];
-                        if (offset === 0 && jogo.status.type.state === 'in') {
-                            if (jogo.situation && jogo.situation.lastPlay && jogo.situation.lastPlay.text) {
-                                window.LIVE_PLAYS_DATA.push(shortIcn + " " + nm2 + " vs " + nm1 + " [" + jogo.situation.lastPlay.text + "]");
-                            }
-                        } else if (offset === 0 && isPost) {
-                            // Se nao ta rolando ao vivo, popula yellow box com finais
-                            window.LIVE_PLAYS_DATA.push(shortIcn + " FIM: " + nm2 + " " + score2Val + " x " + score1Val + " " + nm1);
+                            
+                            // Cria link clicável no letreiro!
+                            var tickerString = "<a href='" + lnk + "' target='_blank' title='Abrir Boxscore da ESPN'>" + icn + " " + nm2 + " " + fakeScoreStr + " " + nm1 + "</a>";
+                            window.LIVE_TICKER_DATA.push(tickerString);
                         }
                     } catch(e) {}
                 }

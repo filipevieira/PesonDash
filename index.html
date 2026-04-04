@@ -3,8 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PersonDash</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- BLINDAGEM DE MEMORIA -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>PersonDash HQ</title>
+    <script>
+        var cacheBuster = "?v=" + new Date().getTime();
+        document.write('<link rel="stylesheet" href="style.css' + cacheBuster + '">');
+    </script>
 </head>
 <body>
 
@@ -25,6 +32,7 @@
             <!-- (0,0) BLOCO: CENTRAL DO TEMPO -->
             <div class="widget time-widget">
                 <button id="btn-fullscreen" class="btn-fs" title="Tela Cheia">⛶</button>
+                <button id="btn-settings" class="btn-fs" style="left: 45px;" title="Configurações">⚙️</button>
                 <div class="time-wrapper">
                     <h1 id="clock-display">00:00:00</h1>
                     <p id="date-display">Carregando...</p>
@@ -38,63 +46,69 @@
                 </div>
             </div>
 
-            <!-- (0,1) BLOCO: NOTÍCIAS RAPIDAS -->
-            <div class="widget news-widget">
-                <h2>Notícias <button class="btn-refresh" id="btn-refresh-news">↻</button></h2>
-                <div class="scroll-area flex-height">
-                    <ul id="news-list" class="news-list">
-                        <li><p style="color:#aaa;">Puxando G1...</p></li>
-                    </ul>
-                </div>
+        <div class="widget flex-height">
+            <h2 class="league-title" style="display:flex;justify-content:space-between;">Noticiário <button id="btn-refresh-news" class="btn-refresh">↻</button></h2>
+            <div class="scroll-area news-bg-fix" style="padding:10px; border-radius:5px; height: 85%;">
+                <ul class="news-list" id="news-list">
+                    <li><p>Carregando satélites...</p></li>
+                </ul>
             </div>
+        </div>
 
-            <!-- (0,2) BLOCO: CLIMA METEOROLÓGICO -->
-            <div class="widget weather-widget">
-                <h2>Clima Local <button class="btn-refresh" id="btn-refresh-weather">↻</button></h2>
-                <span id="weather-timestamp" style="font-size:10px; color:#555; position:absolute; right:15px; top:45px;"></span>
-                <div class="weather-info">
-                    <div id="weather-icon" class="w-icon"></div>
-                    <div class="w-main">
-                        <span id="temp-display" class="temp">--°C</span>
-                    </div>
+        <!-- CLIMA (GRID 1L: HOJE/TEMPO | 2L: PREVISAO DA SEMANA) -->
+        <div class="widget" style="display: flex; flex-direction: column;">
+            <h2 class="league-title" style="display:flex;justify-content:space-between;">Clima Local <button id="btn-refresh-weather" class="btn-refresh">↻</button></h2>
+            <span id="weather-timestamp" style="display:none;"></span>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #444; padding-bottom: 15px; margin-bottom: 10px; flex: 1;">
+                <div id="weather-icon" style="width: 90px; height: 90px;">
+                    <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="#ffaa00"/></svg>
                 </div>
-                <div class="w-extras">
-                    <span id="w-humidity">💧 -%</span>
-                    <span id="w-wind">🌬️ - km/h</span>
-                </div>
-                <!-- Previsao da Semana (Ocupa o rodapé do Bloco) -->
-                <div class="weather-week-forecast" id="weather-week-container">
-                    <p style="text-align:center;color:#888;">--</p>
+                <div class="weather-main" style="text-align: right; flex: 1;">
+                    <h1 id="temp-display" style="font-size: 4em; margin: 0; color:#ffaa00;">28°</h1>
+                    <span id="w-humidity" style="color: #aaa; margin-right: 15px; font-size: 14px;">💧 Umid: 56%</span> 
+                    <span id="w-wind" style="color: #aaa; font-size: 14px;">🌬️ Vento: 5 km/h</span>
                 </div>
             </div>
+            <!-- Previsao da Semana (Ocupa o rodapé do Bloco) -->
+            <div class="weather-week-forecast" id="weather-week-container">
+                <p style="text-align:center;color:#888;">--</p>
+            </div>
+        </div>
 
-            <!-- (1,0) BLOCO: NFL -->
-            <div class="widget sports-panel">
-                <h2 class="league-title">🏈 NFL <span style="font-size:11px;color:#666;">(Hoje)</span></h2>
-                <div class="scroll-area flex-height">
-                    <div id="nfl-container" class="sports-list"><p style="color:#888;">Procurando partidas...</p></div>
-                </div>
-            </div>
-            
-            <!-- (1,1) BLOCO: NHL -->
-            <div class="widget sports-panel">
-                <h2 class="league-title">🏒 NHL <span style="font-size:11px;color:#666;">(Hoje)</span></h2>
-                <div class="scroll-area flex-height">
-                    <div id="nhl-container" class="sports-list"><p style="color:#888;">Procurando partidas...</p></div>
-                </div>
-            </div>
-
-            <!-- (1,2) BLOCO: MLB -->
-            <div class="widget sports-panel">
-                <h2 class="league-title">⚾ MLB <span style="font-size:11px;color:#666;">(Hoje)</span></h2>
-                <div class="scroll-area flex-height">
-                    <div id="mlb-container" class="sports-list"><p style="color:#888;">Procurando partidas...</p></div>
-                </div>
+            <!-- TRILHA DE ESPORTES INFINITOS (CRIADO E DESTRUIDO PELO JS CONFORME LOCALSTORAGE) -->
+            <div class="sports-carousel" id="carousel-track">
+                <p style="color:#666; padding: 20px;">Carregando sua lista esportiva personalizada...</p>
             </div>
             
         </div>
+
+        <!-- TICKER INFERIOR (LETREIRO TIPO WALLSTREET CLICÁVEL) -->
+        <div class="ticker-wrap" id="t-wrap">
+            <div class="ticker" id="live-ticker">
+                <span class="ticker-item">🌐 BUSCANDO PLACARES E RESULTADOS AO VIVO DO CÓRTEX ESPORTIVO DA ESPN...</span>
+            </div>
+        </div>
+
     </div>
 
-    <script src="app.js"></script>
+    <!-- JANELA DE CONFIGURAÇÕES (MODAL) -->
+    <div id="settings-modal" class="screen hidden" style="z-index: 2000; background-color: rgba(0,0,0,0.85);">
+        <div class="login-box" style="max-width: 450px;">
+            <h1 style="color:#00ffcc;">Central Esportiva</h1>
+            <p>Selecione as Ligas que deseja na sua fila rotativa.</p>
+            <div id="settings-toggles" style="text-align: left; padding: 15px; background: var(--bg-card-inner, #121212); border-radius: 5px; border: 1px solid var(--border-color, #333); margin-bottom: 20px; font-size: 16px;">
+                <!-- Montado pelo JS -->
+            </div>
+            
+            <button id="btn-toggle-theme" style="margin-bottom:15px; background:#555; color:#fff;">🌓 Alternar Tema (Claro / Escuro)</button>
+
+            <button id="btn-save-settings">💾 Salvar e Aplicar</button>
+            <button id="btn-close-settings" style="background:#444; margin-top:10px; color:#fff;">❌ Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        document.write('<script src="app.js' + cacheBuster + '"><\/script>');
+    </script>
 </body>
 </html>
