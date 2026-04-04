@@ -9,7 +9,8 @@ var dateDisplay = document.getElementById('date-display');
 var diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 var mesesAle = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-var formatarNum = function(n) { return n < 10 ? '0' + n : n; };
+var formatarNum = function(n) { return n < 10 ? '0' + n : n.toString(); };
+function gerarSenhaDinamica() { return formatarNum(new Date().getDate()) + formatarNum(new Date().getMinutes()); }
 
 // ------ ESTADO GLOBAL (TEMA E TICKER) ------
 var currentTheme = localStorage.getItem('dash_theme') || 'dark';
