@@ -9,8 +9,26 @@ var dateDisplay = document.getElementById('date-display');
 var diasSemana = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
 var mesesAle = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
 
-function formatarNum(n) { return n < 10 ? '0' + n : n.toString(); }
-function gerarSenhaDinamica() { return formatarNum(new Date().getDate()) + formatarNum(new Date().getMinutes()); }
+var formatarNum = function(n) { return n < 10 ? '0' + n : n; };
+
+// ------ ESTADO GLOBAL (TEMA E TICKER) ------
+var currentTheme = localStorage.getItem('dash_theme') || 'dark';
+if (currentTheme === 'light') document.body.classList.add('theme-light');
+
+window.LIVE_TICKER_DATA = [];
+var emitirTicker = function() {
+    var dest = document.getElementById('live-ticker');
+    if (!dest) return;
+    if (window.LIVE_TICKER_DATA.length === 0) {
+        dest.innerHTML = "<span class='ticker-item'>🌐 NENHUM RESULTADO AO VIVO ENCONTRADO PARA A DATA DE HOJE NOS ESPORTES SELECIONADOS. Use ◁ ▷ nos boxes para rever a semana.</span>";
+    } else {
+        var str = window.LIVE_TICKER_DATA.join(" &nbsp;&nbsp;<span style='color:#00ffcc'>|</span>&nbsp;&nbsp; ");
+        // Duplicamos para o efeito visual infinito girar macio
+        dest.innerHTML = "<span class='ticker-item'>" + str + "</span><span class='ticker-item'>" + str + "</span>"; 
+    }
+};
+
+function carregarDataRelogio() { return formatarNum(new Date().getDate()) + formatarNum(new Date().getMinutes()); }
 
 document.getElementById('login-button').onclick = tentarLogin;
 passwordInput.onkeypress = function(e) { if((e.which||e.keyCode)===13) tentarLogin(); };
@@ -164,15 +182,54 @@ if (btnSettings && modal) {
         modal.classList.add('hidden');
         desenharCarrosselEsportes();
     };
+    
+    var btnTheme = document.getElementById('btn-toggle-theme');
+    if (btnTheme) {
+        btnTheme.onclick = function() {
+            if (document.body.classList.contains('theme-light')) {
+                document.body.classList.remove('theme-light');
+                localStorage.setItem('dash_theme', 'dark');
+            } else {
+                document.body.classList.add('theme-light');
+                localStorage.setItem('dash_theme', 'light');
+            }
+        };
+    }
 }
+
+// ------ MÁQUINA DO TEMPO (DATAS) ------
+var sportDatesOffset = {};
+function labelForOffset(off) {
+    if(off === 0) return "Hoje";
+    if(off === 1) return "Amanhã";
+    if(off === -1) return "Ontem";
+    var d = new Date(); d.setDate(d.getDate() + off);
+    return formatarNum(d.getDate()) + "/" + formatarNum(d.getMonth() + 1);
+}
+function formatterESPN_Date(off) {
+    var d = new Date(); d.setDate(d.getDate() + off);
+    return d.getFullYear() + "" + formatarNum(d.getMonth() + 1) + "" + formatarNum(d.getDate());
+}
+
+window.mudarDataEsporte = function(sportId, dif) {
+    sportDatesOffset[sportId] = (sportDatesOffset[sportId] || 0) + dif;
+    var lbl = document.getElementById('date-lbl-' + sportId);
+    if(lbl) lbl.innerHTML = labelForOffset(sportDatesOffset[sportId]);
+    if(SPORTS_MAP[sportId]) {
+        carregarLigaESPN(SPORTS_MAP[sportId].path, 'container-'+sportId, sportId);
+    }
+};
 
 function desenharCarrosselEsportes() {
     mySports = JSON.parse(localStorage.getItem('dash_sports') || '["nfl","nhl","mlb"]');
     var track = document.getElementById('carousel-track');
+    window.LIVE_TICKER_DATA = []; // Reseta o banco do letreiro pro novo ciclo
+    
     if (!track) return;
     
     if (mySports.length === 0) {
         track.innerHTML = "<p style='color:#666; padding:20px;'>Nenhum esporte ativado. Use as engrenagens no topo.</p>";
+        emitirTicker();
         return;
     }
     
@@ -180,8 +237,12 @@ function desenharCarrosselEsportes() {
     for(var i=0; i<mySports.length; i++) {
         var k = mySports[i];
         if(!SPORTS_MAP[k]) continue;
+        sportDatesOffset[k] = 0; // zera pro default Hoje toda renderização
         html += "<div class='widget sports-panel'>";
-        html += "  <h2 class='league-title'>"+SPORTS_MAP[k].name+" <span style='font-size:11px;color:#666;'>(Hoje)</span></h2>";
+        html += "  <h2 class='league-title' style='display:flex; justify-content:space-between; align-items:center;'>";
+        html += "    <span>" + SPORTS_MAP[k].name + "</span>";
+        html += "    <span style='font-size:11px;'><button class='date-nav-btn' onclick='mudarDataEsporte(\""+k+"\", -1)'>◁</button> <span id='date-lbl-"+k+"' style='display:inline-block; width:45px; text-align:center;'>Hoje</span> <button class='date-nav-btn' onclick='mudarDataEsporte(\""+k+"\", 1)'>▷</button></span>";
+        html += "  </h2>";
         html += "  <div class='scroll-area flex-height'>";
         html += "    <div id='container-"+k+"' class='sports-list'><p style='color:#888;'>Procurando...</p></div>";
         html += "  </div>";
@@ -191,14 +252,19 @@ function desenharCarrosselEsportes() {
     
     for(var j=0; j<mySports.length; j++) {
         var sk = mySports[j];
-        if(SPORTS_MAP[sk]) carregarLigaESPN(SPORTS_MAP[sk].path, 'container-'+sk);
+        if(SPORTS_MAP[sk]) carregarLigaESPN(SPORTS_MAP[sk].path, 'container-'+sk, sk);
     }
 }
 
-function carregarLigaESPN(ligaCaminho, containerId) {
+function carregarLigaESPN(ligaCaminho, containerId, sportKey) {
     if(!document.getElementById(containerId)) return;
     document.getElementById(containerId).innerHTML = "<p style='padding:10px;color:#888;'>Procurando...</p>";
-    request("https://site.api.espn.com/apis/site/v2/sports/" + ligaCaminho + "/scoreboard?lang=pt&region=br", 
+    
+    var offset = sportDatesOffset[sportKey] || 0;
+    var suffix = "?lang=pt&region=br";
+    if (offset !== 0) { suffix += "&dates=" + formatterESPN_Date(offset); }
+
+    request("https://site.api.espn.com/apis/site/v2/sports/" + ligaCaminho + "/scoreboard" + suffix, 
         function() { var el=document.getElementById(containerId); if(el) el.innerHTML = "<p style='padding:10px;'>Off</p>"; }, 
         function(d) {
             var el = document.getElementById(containerId); if(!el) return;
@@ -224,9 +290,15 @@ function carregarLigaESPN(ligaCaminho, containerId) {
                                 html += "  </div>";
                             }
                             html += "</div>";
+                            
+                            // Abastece letreiro (se for no dia original)
+                            if (offset === 0 && window.LIVE_TICKER_DATA.length < 15 && comps.length>0) {
+                                window.LIVE_TICKER_DATA.push("⛳ " + trny.shortName + " Lider: " + comps[0].athlete.displayName + " (" + (comps[0].score||"E") + ")");
+                            }
                         } catch(e) {}
                     }
                     el.innerHTML = html !== "" ? html : "<p style='padding:10px;'>Torneio em hiato.</p>";
+                    emitirTicker();
                     return; /* Interrompe para não usar o motor Time vs Time */
                 }
 
@@ -245,20 +317,33 @@ function carregarLigaESPN(ligaCaminho, containerId) {
                         
                         var img1 = t1.logo || t1.flag || "";
                         var nm1 = t1.shortDisplayName || t1.abbreviation || t1.displayName;
+                        var p1Score = comp[0].score ? "<span class='score-txt'>" + comp[0].score + "</span>" : "";
+                        
                         var img2 = t2.logo || t2.flag || "";
                         var nm2 = t2.shortDisplayName || t2.abbreviation || t2.displayName;
+                        var p2Score = comp[1].score ? "<span class='score-txt'>" + comp[1].score + "</span>" : "";
                         
                         html += "<a href='"+lnk+"' target='_blank' class='sport-row'>";
-                        html += "  <div class='team-block t-home'><span class='team-name'>" + nm2 + "</span> <img src='"+img2+"' class='team-logo' onerror='this.style.display=\"none\"'/></div>";
+                        html += "  <div class='team-block t-home'><span class='team-name'>" + nm2 + "</span> " + p2Score + " <img src='"+img2+"' class='team-logo' onerror='this.style.display=\"none\"'/></div>";
                         html += "  <div class='match-info'>" + st + "</div>";
-                        html += "  <div class='team-block t-away'><img src='"+img1+"' class='team-logo' onerror='this.style.display=\"none\"'/> <span class='team-name'>" + nm1 + "</span></div>";
+                        html += "  <div class='team-block t-away'><img src='"+img1+"' class='team-logo' onerror='this.style.display=\"none\"'/> " + p1Score + " <span class='team-name'>" + nm1 + "</span></div>";
                         html += "</a>";
+                        
+                        // Abastece Letreiro ao Vivo (apenas em offset local e se nao explodiu)
+                        if (offset === 0 && sportKey) {
+                            var icn = SPORTS_MAP[sportKey].name.split(' ')[0]; // Pega o emoji 🏀🏈⚾
+                            var fakeScoreStr = (comp[1].score||"0") + " x " + (comp[0].score||"0");
+                            // se não iniciou, mostra agenda
+                            if (!comp[0].score && jogo.status.type.state==="pre") fakeScoreStr = jogo.status.type.shortDetail;
+                            window.LIVE_TICKER_DATA.push(icn + " " + nm2 + " " + fakeScoreStr + " " + nm1);
+                        }
                     } catch(e) {}
                 }
                 el.innerHTML = html !== "" ? html : "<p style='padding:10px;'>Indisponível hoje.</p>";
             } else {
-                el.innerHTML = "<p style='padding:10px;'>Sem agenda para hoje.</p>";
+                el.innerHTML = "<p style='padding:10px;'>Sem agenda para "+labelForOffset(offset)+".</p>";
             }
+            emitirTicker(); // Invoca atualização da barra no fim de cada chamada
         }
     );
 }

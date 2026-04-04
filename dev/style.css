@@ -125,9 +125,33 @@ html, body {
 /* COMPATIBILIDADE LEGAIS DE ANDROID/APPLE */
 @-webkit-keyframes ticker { 
     0% { -webkit-transform: translate3d(100vw, 0, 0); transform: translate3d(100vw, 0, 0); visibility: visible; } 
-    100% { -webkit-transform: translate3d(-100%, 0, 0); transform: translate3d(-100%, 0, 0); } 
+    100% { -webkit-transform: translate3d(-100vw, 0, 0); transform: translate3d(-100vw, 0, 0); } 
 }
 @keyframes ticker { 
     0% { -webkit-transform: translate3d(100vw, 0, 0); transform: translate3d(100vw, 0, 0); visibility: visible; } 
-    100% { -webkit-transform: translate3d(-100%, 0, 0); transform: translate3d(-100%, 0, 0); } 
+    100% { -webkit-transform: translate3d(-100vw, 0, 0); transform: translate3d(-100vw, 0, 0); } 
 }
+
+/* NAVEGAÇÃO DE DATAS & SCORES */
+.score-txt { font-weight: bold; color: #fff; font-size: 14px; margin: 0 5px; }
+.date-nav-btn { background: none; border: 1px solid #444; border-radius: 3px; color: #00ffcc; cursor: pointer; font-size: 10px; padding: 2px 6px; margin: 0 4px; transition: background 0.3s;}
+.date-nav-btn:hover { background: #333; color: #fff; }
+
+/* TEMA CLARO (LIGHT MODE) */
+body.theme-light { background-color: #f4f4f5; color: #111; transition: background 0.5s; }
+.theme-light .widget { background-color: #ffffff; border-color: #ccc; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.theme-light .league-title { color: #111; border-bottom: 1px dashed #ccc; }
+.theme-light .sport-row { border-bottom: 1px solid #eee; }
+.theme-light .sport-row:hover { background-color: #f9f9f9; }
+.theme-light .team-name { color: #333; }
+.theme-light .match-info { color: #0066cc; }
+.theme-light .score-txt { color: #111; }
+.theme-light .ticker-wrap { background-color: #e5e5e5; border-top: 1px solid #ccc; }
+.theme-light .ticker-item { color: #222; }
+.theme-light .login-box { background-color: #fff; border-color: #ddd; color: #111; }
+.theme-light .login-box p { color: #333; }
+.theme-light #settings-toggles { background-color: #f9f9f9 !important; border-color: #ccc !important; }
+.theme-light .w-extras { border-top: 1px dotted #ccc; }
+.theme-light .day-row { border-bottom: 1px solid #eee; }
+.theme-light .date-nav-btn { border-color: #ccc; color: #0066cc; }
+.theme-light .date-nav-btn:hover { background: #eee; }

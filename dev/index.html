@@ -85,16 +85,8 @@
 
         <!-- TICKER INFERIOR (LETREIRO TIPO WALLSTREET) -->
         <div class="ticker-wrap">
-            <div class="ticker">
-                <span class="ticker-item">🌐 O SUCESSO EXIGE DEDICAÇÃO CONTÍNUA E RITMO.</span>
-                <span class="ticker-item" style="color:#00ffcc">|</span>
-                <span class="ticker-item">📈 BTC/BRL: R$ 421.350,00</span>
-                <span class="ticker-item" style="color:#00ffcc">|</span>
-                <span class="ticker-item">💻 MANTENHA O FOCO NO QUE REALMENTE IMPORTA O ESTOICISMO PROTEGE O RESULTADO.</span>
-                <span class="ticker-item" style="color:#00ffcc">|</span>
-                <span class="ticker-item">📉 USD/BRL: R$ 5,02</span>
-                <span class="ticker-item" style="color:#00ffcc">|</span>
-                <span class="ticker-item">🤖 O SISTEMA ESTÁ 100% OPERACIONAL E OTIMIZADO PARA ALTA PERFORMANCE.</span>
+            <div class="ticker" id="live-ticker">
+                <span class="ticker-item">🌐 BUSCANDO PLACARES E RESULTADOS AO VIVO DO CÓRTEX ESPORTIVO DA ESPN...</span>
             </div>
         </div>
 
@@ -105,11 +97,14 @@
         <div class="login-box" style="max-width: 450px;">
             <h1 style="color:#00ffcc;">Central Esportiva</h1>
             <p>Selecione as Ligas que deseja na sua fila rotativa.</p>
-            <div id="settings-toggles" style="text-align: left; padding: 15px; background: #121212; border-radius: 5px; border: 1px solid #333; margin-bottom: 20px; font-size: 16px;">
+            <div id="settings-toggles" style="text-align: left; padding: 15px; background: var(--bg-card-inner, #121212); border-radius: 5px; border: 1px solid var(--border-color, #333); margin-bottom: 20px; font-size: 16px;">
                 <!-- Montado pelo JS -->
             </div>
+            
+            <button id="btn-toggle-theme" style="margin-bottom:15px; background:#555; color:#fff;">🌓 Alternar Tema (Claro / Escuro)</button>
+
             <button id="btn-save-settings">💾 Salvar e Aplicar</button>
-            <button id="btn-close-settings" style="background:#555; margin-top:10px;">❌ Cancelar</button>
+            <button id="btn-close-settings" style="background:#444; margin-top:10px; color:#fff;">❌ Cancelar</button>
         </div>
     </div>
 
