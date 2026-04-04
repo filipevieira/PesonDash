@@ -1,0 +1,105 @@
+html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%; font-family: Arial, Helvetica, sans-serif;
+    background-color: #121212; color: #e0e0e0; box-sizing: border-box; overflow: hidden;
+}
+*, *:before, *:after { box-sizing: inherit; }
+.screen { width: 100%; min-height: 100%; position: absolute; top: 0; left: 0; background-color: #121212; }
+.visible { display: block; }
+.hidden { display: none; }
+
+/* TELA DE LOGIN */
+.login-box { width: 90%; max-width: 320px; margin: 100px auto; background-color: #1e1e1e; padding: 30px; border-radius: 10px; text-align: center; box-shadow: 0px 5px 15px rgba(0,0,0,0.5); border: 1px solid #333; }
+.login-box h1 { color: #00ffcc; margin-top: 0; }
+.login-box input { width: 100%; padding: 15px; margin: 15px 0; background-color: #2b2b2b; border: 1px solid #444; color: #00ffcc; font-size: 24px; text-align: center; border-radius: 5px; letter-spacing: 5px; }
+.login-box button { width: 100%; padding: 15px; background-color: #00ffcc; color: #121212; border: none; font-size: 18px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+.error-msg { color: #ff4444; font-weight: bold; margin-top: 15px; }
+
+/* LAYOUT 3x3 GRID MODULAR */
+.widgets-container { padding: 10px; width: 100%; height: 100%; margin: 0; }
+.widgets-container:after { content: ""; display: table; clear: both; }
+
+/* TODAS AS CAIXAS SAO IDENTICAS */
+.widget { 
+    width: 31.33%; 
+    height: 320px; /* Altura restrita do GRID */
+    float: left; 
+    margin: 1%; 
+    background-color: #1a1a1a; 
+    border-radius: 10px; 
+    padding: 15px; 
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.3); 
+    border: 1px solid #333; 
+    position: relative; /* para anchors absolutos como fullscreen */
+}
+
+.widget h2 { margin-top: 0; color: #fff; font-size: 18px; border-bottom: 1px solid #444; padding-bottom: 8px; margin-bottom: 10px; }
+.btn-refresh { float: right; background: none; border: 1px solid #444; color: #aaa; border-radius: 5px; cursor: pointer; font-size: 14px; padding: 0px 6px; }
+.btn-refresh:active { background: #444; color: #fff; }
+
+@media screen and (max-width: 900px) {
+    .widget { width: 48%; }
+}
+@media screen and (max-width: 600px) {
+    .widget { width: 98%; display: block; float: none; height: auto; min-height: 250px; }
+    html, body { overflow: auto; } /* No celulr permite scroll inteiro */
+}
+
+/* WIDGET TEMPO (HEADER) */
+.time-widget { text-align: center; display: flex; flex-direction: column; justify-content: center; }
+.btn-fs { position: absolute; top: 10px; left: 10px; background: none; border: 1px solid #444; border-radius: 4px; color: #ccc; font-size: 20px; cursor: pointer; padding: 0 4px; }
+.btn-fs:hover { color: #fff; border-color: #666; }
+.time-wrapper { margin-top: 10px; }
+#clock-display { font-size: 60px; margin: 0; color: #00ffcc; text-shadow: 0px 0px 10px rgba(0,255,204,0.3); line-height: 1; }
+#date-display { font-size: 18px; color: #aaa; margin: 10px 0; }
+.pills-container { margin-top: 5px; }
+.pill { display: inline-block; background-color: #2b2b2b; color: #ccc; padding: 4px 8px; margin: 2px; border-radius: 12px; font-size: 11px; border: 1px solid #444; }
+
+/* ROLLBARS INTERNAS */
+.scroll-area { width: 100%; overflow-y: auto; background-color: #1e1e1e; border-radius: 5px; padding: 8px; box-shadow: inset 0px 2px 5px rgba(0,0,0,0.5); }
+.flex-height { height: 235px; } /* Calc: 320(box) - 30(pad) - 40(h2) = 250 - X extra space */
+
+.scroll-area::-webkit-scrollbar { width: 6px; }
+.scroll-area::-webkit-scrollbar-track { background: #222; border-radius: 3px; }
+.scroll-area::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+.scroll-area::-webkit-scrollbar-thumb:hover { background: #555; }
+
+/* CLIMA */
+.weather-info { text-align: center; margin-top: 0; margin-bottom: 5px; }
+.w-icon { display: inline-block; width: 60px; height: 60px; vertical-align: middle; margin-right: 15px; }
+.w-main { display: inline-block; vertical-align: middle; text-align: left; }
+.weather-info .temp { display: block; font-size: 38px; color: #ffaa00; line-height: 1; margin-bottom: 5px; }
+.weather-info .condition { font-size: 14px; color: #bbb; }
+.w-extras { text-align: center; font-size: 12px; color: #888; margin-bottom: 10px; }
+.w-extras span { margin: 0 10px; }
+
+.weather-week-forecast { margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; width: 100%; clear: both; overflow: hidden; }
+.f-week-box { width: 14%; float: left; text-align: center; }
+.f-week-day { display: block; font-size: 10px; color: #aaa; text-transform: uppercase; font-weight: bold; }
+.f-week-val { display: block; font-size: 11px; color: #00ffcc; font-weight: bold; margin-top: 4px; white-space: nowrap; }
+
+/* NOTÍCIAS LINKS */
+.news-list { list-style: none; padding: 0; margin: 0; }
+.news-list li { padding: 10px 4px; border-bottom: 1px dashed #333; font-size: 14px; line-height: 1.4; }
+.news-list li:last-child { border-bottom: none; }
+.news-list a { color: #ddd; text-decoration: none; display:block; }
+.news-list a:hover { color: #00ffcc; }
+
+/* ESPORTES COM LOGOS */
+.league-title { color: #fff; font-size: 16px; border-bottom: 1px dashed #555; padding-bottom: 5px; margin: 0 0 10px 0; }
+.sports-list { margin: 0; }
+.sport-row { padding: 10px 5px; border-bottom: 1px solid #2b2b2b; display: block; text-decoration: none; transition: background 0.2s; border-radius: 4px; }
+.sport-row:hover { background-color: #2b2b2b; }
+.sport-row:last-child { border-bottom: none; }
+
+.team-block { display: inline-block; vertical-align: middle; width: 35%; }
+.t-home { text-align: right; }
+.t-away { text-align: left; }
+.team-logo { width: 22px; height: 22px; vertical-align: middle; display: inline-block; object-fit: contain; background: #fff; border-radius: 3px; padding: 1px; }
+.team-name { color: #eee; font-size: 13px; font-weight: bold; margin: 0 5px; vertical-align: middle; display: inline-block; }
+
+.match-info { display: inline-block; vertical-align: middle; width: 26%; text-align: center; color: #00ffcc; font-size: 11px; font-weight:bold; }
+@media screen and (max-width: 600px) {
+    .team-name { display: none; } 
+    .team-block { width: 20%; }
+    .match-info { width: 50%; }
+}

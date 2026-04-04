@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- BLINDAGEM DE MEMORIA -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>[DEV] PersonDash</title>
+    <script>
+        var cacheBuster = "?v=" + new Date().getTime();
+        document.write('<link rel="stylesheet" href="style.css' + cacheBuster + '">');
+    </script>
+</head>
+<body>
+
+    <div id="login-screen" class="screen visible">
+        <div class="login-box">
+            <h1>PersonDash</h1>
+            <p>Insira a senha dinâmica</p>
+            <input type="password" id="password-input" placeholder="****" />
+            <button id="login-button">Entrar</button>
+            <p id="login-error" class="error-msg" style="display: none;">Senha Incorreta</p>
+        </div>
+    </div>
+
+    <!-- TELA CHEIA ATRAVÉS DO REQUESTFULLSCREEN -->
+    <div id="dashboard-screen" class="screen hidden">
+        <div class="widgets-container">
+            
+            <!-- (0,0) BLOCO: CENTRAL DO TEMPO -->
+            <div class="widget time-widget">
+                <button id="btn-fullscreen" class="btn-fs" title="Tela Cheia">⛶</button>
+                <div class="time-wrapper">
+                    <h1 id="clock-display">00:00:00</h1>
+                    <p id="date-display">Carregando...</p>
+                </div>
+                
+                <div class="pills-container" id="pills-container">
+                    <span class="pill" id="pill-diaano">Ano: --</span>
+                    <span class="pill" id="pill-semana">Sem: --</span>
+                    <span class="pill" id="pill-restante">Faltam: --</span>
+                    <span class="pill" id="pill-lua">Lua: --</span>
+                </div>
+            </div>
+
+            <!-- (0,1) BLOCO: NOTÍCIAS RAPIDAS -->
+            <div class="widget news-widget">
+                <h2>Notícias <button class="btn-refresh" id="btn-refresh-news">↻</button></h2>
+                <div class="scroll-area flex-height">
+                    <ul id="news-list" class="news-list">
+                        <li><p style="color:#aaa;">Puxando G1...</p></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- (0,2) BLOCO: CLIMA METEOROLÓGICO -->
+            <div class="widget weather-widget">
+                <h2>Clima Local <button class="btn-refresh" id="btn-refresh-weather">↻</button></h2>
+                <span id="weather-timestamp" style="font-size:10px; color:#555; position:absolute; right:15px; top:45px;"></span>
+                <div class="weather-info">
+                    <div id="weather-icon" class="w-icon"></div>
+                    <div class="w-main">
+                        <span id="temp-display" class="temp">--°C</span>
+                    </div>
+                </div>
+                <div class="w-extras">
+                    <span id="w-humidity">💧 -%</span>
+                    <span id="w-wind">🌬️ - km/h</span>
+                </div>
+                <!-- Previsao da Semana (Ocupa o rodapé do Bloco) -->
+                <div class="weather-week-forecast" id="weather-week-container">
+                    <p style="text-align:center;color:#888;">--</p>
+                </div>
+            </div>
+
+            <!-- (1,0) BLOCO: NFL -->
+            <div class="widget sports-panel">
+                <h2 class="league-title">🏈 NFL <span style="font-size:11px;color:#666;">(Hoje)</span></h2>
+                <div class="scroll-area flex-height">
+                    <div id="nfl-container" class="sports-list"><p style="color:#888;">Procurando partidas...</p></div>
+                </div>
+            </div>
+            
+            <!-- (1,1) BLOCO: NHL -->
+            <div class="widget sports-panel">
+                <h2 class="league-title">🏒 NHL <span style="font-size:11px;color:#666;">(Hoje)</span></h2>
+                <div class="scroll-area flex-height">
+                    <div id="nhl-container" class="sports-list"><p style="color:#888;">Procurando partidas...</p></div>
+                </div>
+            </div>
+
+            <!-- (1,2) BLOCO: MLB -->
+            <div class="widget sports-panel">
+                <h2 class="league-title">⚾ MLB <span style="font-size:11px;color:#666;">(Hoje)</span></h2>
+                <div class="scroll-area flex-height">
+                    <div id="mlb-container" class="sports-list"><p style="color:#888;">Procurando partidas...</p></div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        document.write('<script src="app.js' + cacheBuster + '"><\/script>');
+    </script>
+</body>
+</html>
