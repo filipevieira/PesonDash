@@ -82,7 +82,9 @@ function getIconeClima(c) {
 }
 
 function carregarClima() {
-    var ts = new Date(); document.getElementById('weather-timestamp').innerHTML = "Última att: " + formatarNum(ts.getHours()) + ":" + formatarNum(ts.getMinutes());
+    var ts = new Date(); 
+    var ets = document.getElementById('weather-timestamp');
+    if(ets) ets.innerHTML = "Última att: " + formatarNum(ts.getHours()) + ":" + formatarNum(ts.getMinutes());
     request("https://api.open-meteo.com/v1/forecast?latitude=-22.9056&longitude=-47.0608&current_weather=true&daily=temperature_2m_max,temperature_2m_min&hourly=relativehumidity_2m&timezone=America%2FSao_Paulo", 
         function() { document.getElementById('weather-week-container').innerHTML = "<p>Erro na API.</p>"; }, 
         function(data) {
