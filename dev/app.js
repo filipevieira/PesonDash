@@ -128,39 +128,110 @@ function carregarNoticias() {
     });
 }
 
-// ------ ESPORTES ESPN DELUXE (LOGOS) ------
+// ------ ESPORTES ESPN DELUXE (LOGOS E CARROSSEL) ------
+var SPORTS_MAP = {
+    nfl: { id: 'nfl', name: '🏈 NFL', path: 'football/nfl' },
+    nhl: { id: 'nhl', name: '🏒 NHL', path: 'hockey/nhl' },
+    mlb: { id: 'mlb', name: '⚾ MLB', path: 'baseball/mlb' },
+    nba: { id: 'nba', name: '🏀 NBA', path: 'basketball/nba' },
+    nbb: { id: 'nbb', name: '🏀 Basquete BR', path: 'basketball/mens-college-basketball' }, // Fallback generico
+    tenis: { id: 'tenis', name: '🎾 Tênis ATP', path: 'tennis/atp' },
+    golfe: { id: 'golfe', name: '⛳ Golfe PGA', path: 'golf/pga' }
+};
+
+var mySports = JSON.parse(localStorage.getItem('dash_sports') || '["nfl","nhl","mlb"]');
+
+var modal = document.getElementById('settings-modal');
+var btnSettings = document.getElementById('btn-settings');
+var togglesBox = document.getElementById('settings-toggles');
+
+if (btnSettings && modal) {
+    btnSettings.onclick = function() {
+        var h = "";
+        for(var key in SPORTS_MAP) {
+            var checked = mySports.indexOf(key) > -1 ? "checked" : "";
+            h += "<label class='chk-row'><input type='checkbox' class='sport-chk' value='"+key+"' "+checked+"> " + SPORTS_MAP[key].name + "</label>";
+        }
+        togglesBox.innerHTML = h;
+        modal.classList.remove('hidden');
+    };
+    
+    document.getElementById('btn-close-settings').onclick = function() { modal.classList.add('hidden'); };
+    document.getElementById('btn-save-settings').onclick = function() {
+        var chks = document.querySelectorAll('.sport-chk');
+        var newSports = [];
+        for(var i=0; i<chks.length; i++) { if(chks[i].checked) newSports.push(chks[i].value); }
+        localStorage.setItem('dash_sports', JSON.stringify(newSports));
+        modal.classList.add('hidden');
+        desenharCarrosselEsportes();
+    };
+}
+
+function desenharCarrosselEsportes() {
+    mySports = JSON.parse(localStorage.getItem('dash_sports') || '["nfl","nhl","mlb"]');
+    var track = document.getElementById('carousel-track');
+    if (!track) return;
+    
+    if (mySports.length === 0) {
+        track.innerHTML = "<p style='color:#666; padding:20px;'>Nenhum esporte ativado. Use as engrenagens no topo.</p>";
+        return;
+    }
+    
+    var html = "";
+    for(var i=0; i<mySports.length; i++) {
+        var k = mySports[i];
+        if(!SPORTS_MAP[k]) continue;
+        html += "<div class='widget sports-panel'>";
+        html += "  <h2 class='league-title'>"+SPORTS_MAP[k].name+" <span style='font-size:11px;color:#666;'>(Hoje)</span></h2>";
+        html += "  <div class='scroll-area flex-height'>";
+        html += "    <div id='container-"+k+"' class='sports-list'><p style='color:#888;'>Procurando...</p></div>";
+        html += "  </div>";
+        html += "</div>";
+    }
+    track.innerHTML = html;
+    
+    for(var j=0; j<mySports.length; j++) {
+        var sk = mySports[j];
+        if(SPORTS_MAP[sk]) carregarLigaESPN(SPORTS_MAP[sk].path, 'container-'+sk);
+    }
+}
+
 function carregarLigaESPN(ligaCaminho, containerId) {
+    if(!document.getElementById(containerId)) return;
     document.getElementById(containerId).innerHTML = "<p style='padding:10px;color:#888;'>Procurando...</p>";
     request("https://site.api.espn.com/apis/site/v2/sports/" + ligaCaminho + "/scoreboard?lang=pt&region=br", 
-        function() { document.getElementById(containerId).innerHTML = "<p style='padding:10px;'>Off</p>"; }, 
+        function() { var el=document.getElementById(containerId); if(el) el.innerHTML = "<p style='padding:10px;'>Off</p>"; }, 
         function(d) {
+            var el = document.getElementById(containerId); if(!el) return;
             if(d && d.events && d.events.length > 0) {
                 var html = "";
                 for(var i=0; i<d.events.length; i++) {
-                    var jogo = d.events[i];
-                    var st = jogo.status.type.shortDetail;
-                    var lnk = (jogo.links && jogo.links.length > 0) ? jogo.links[0].href : "#";
-                    
-                    var comp = jogo.competitions[0].competitors;
-                    
-                    // Extrai as duas equipes da Array competitors (Mandante e Visitante)
-                    var t1 = comp[0].team;
-                    var t2 = comp[1].team;
-                    var img1 = t1.logo || "";
-                    var nm1 = t1.shortDisplayName || t1.abbreviation;
-                    var img2 = t2.logo || "";
-                    var nm2 = t2.shortDisplayName || t2.abbreviation;
-                    
-                    // Estrutura de Batalha: T2 [IMG] vs [IMG] T1
-                    html += "<a href='"+lnk+"' target='_blank' class='sport-row'>";
-                    html += "  <div class='team-block t-home'><span class='team-name'>" + nm2 + "</span> <img src='"+img2+"' class='team-logo' onerror='this.style.display=\"none\"'/></div>";
-                    html += "  <div class='match-info'>" + st + "</div>";
-                    html += "  <div class='team-block t-away'><img src='"+img1+"' class='team-logo' onerror='this.style.display=\"none\"'/> <span class='team-name'>" + nm1 + "</span></div>";
-                    html += "</a>";
+                    try {
+                        var jogo = d.events[i];
+                        var st = jogo.status.type.shortDetail;
+                        var lnk = (jogo.links && jogo.links.length > 0) ? jogo.links[0].href : "#";
+                        var comp = jogo.competitions[0].competitors;
+                        
+                        if(comp.length < 2) continue; // Ignora atletas solitarios estranhos
+                        
+                        var t1 = comp[0].team || comp[0].athlete;
+                        var t2 = comp[1].team || comp[1].athlete;
+                        
+                        var img1 = t1.logo || t1.flag || "";
+                        var nm1 = t1.shortDisplayName || t1.abbreviation || t1.displayName;
+                        var img2 = t2.logo || t2.flag || "";
+                        var nm2 = t2.shortDisplayName || t2.abbreviation || t2.displayName;
+                        
+                        html += "<a href='"+lnk+"' target='_blank' class='sport-row'>";
+                        html += "  <div class='team-block t-home'><span class='team-name'>" + nm2 + "</span> <img src='"+img2+"' class='team-logo' onerror='this.style.display=\"none\"'/></div>";
+                        html += "  <div class='match-info'>" + st + "</div>";
+                        html += "  <div class='team-block t-away'><img src='"+img1+"' class='team-logo' onerror='this.style.display=\"none\"'/> <span class='team-name'>" + nm1 + "</span></div>";
+                        html += "</a>";
+                    } catch(e) {}
                 }
-                document.getElementById(containerId).innerHTML = html;
+                el.innerHTML = html !== "" ? html : "<p style='padding:10px;'>Indisponível hoje.</p>";
             } else {
-                document.getElementById(containerId).innerHTML = "<p style='padding:10px;'>Sem agenda para hoje.</p>";
+                el.innerHTML = "<p style='padding:10px;'>Sem agenda para hoje.</p>";
             }
         }
     );
@@ -175,9 +246,7 @@ function iniciarDashboard() {
     document.getElementById('btn-refresh-news').onclick = carregarNoticias;
     carregarNoticias();
     
-    carregarLigaESPN('football/nfl', 'nfl-container');
-    carregarLigaESPN('hockey/nhl', 'nhl-container');
-    carregarLigaESPN('baseball/mlb', 'mlb-container');
+    desenharCarrosselEsportes();
     
     // Refresh Global Backup
     setTimeout(function() { window.location.reload(); }, 30 * 60 * 1000);
