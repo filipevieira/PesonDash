@@ -57,6 +57,8 @@
 
         <!-- CLIMA (GRID 1L: HOJE/TEMPO | 2L: PREVISAO DA SEMANA) -->
         <div class="widget" style="display: flex; flex-direction: column;">
+            <h2 class="league-title" style="display:flex;justify-content:space-between;">Clima Local <button id="btn-refresh-weather" class="btn-refresh">↻</button></h2>
+            <span id="weather-timestamp" style="display:none;"></span>
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px dashed #444; padding-bottom: 15px; margin-bottom: 10px; flex: 1;">
                 <div id="weather-icon" style="width: 90px; height: 90px;">
                     <svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="#ffaa00"/></svg>
@@ -66,11 +68,12 @@
                     <span id="w-humidity" style="color: #aaa; margin-right: 15px; font-size: 14px;">💧 Umid: 56%</span> 
                     <span id="w-wind" style="color: #aaa; font-size: 14px;">🌬️ Vento: 5 km/h</span>
                 </div>
-            </div>    <!-- Previsao da Semana (Ocupa o rodapé do Bloco) -->
-                <div class="weather-week-forecast" id="weather-week-container">
-                    <p style="text-align:center;color:#888;">--</p>
-                </div>
             </div>
+            <!-- Previsao da Semana (Ocupa o rodapé do Bloco) -->
+            <div class="weather-week-forecast" id="weather-week-container">
+                <p style="text-align:center;color:#888;">--</p>
+            </div>
+        </div>
 
             <!-- TRILHA DE ESPORTES INFINITOS (CRIADO E DESTRUIDO PELO JS CONFORME LOCALSTORAGE) -->
             <div class="sports-carousel" id="carousel-track">

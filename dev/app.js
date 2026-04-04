@@ -413,10 +413,12 @@ function carregarLigaESPN(ligaCaminho, containerId, sportKey) {
 function iniciarDashboard() {
     calcularInfoHeader(); atualizarRelogio(); setInterval(atualizarRelogio, 1000);
     
-    document.getElementById('btn-refresh-weather').onclick = carregarClima;
+    var wBtn = document.getElementById('btn-refresh-weather');
+    if (wBtn) wBtn.onclick = carregarClima;
     carregarClima();
     
-    document.getElementById('btn-refresh-news').onclick = carregarNoticias;
+    var nBtn = document.getElementById('btn-refresh-news');
+    if (nBtn) nBtn.onclick = carregarNoticias;
     carregarNoticias();
     
     desenharCarrosselEsportes();
