@@ -17,6 +17,7 @@ var currentTheme = localStorage.getItem('dash_theme') || 'dark';
 if (currentTheme === 'light') document.body.classList.add('theme-light');
 
 window.LIVE_TICKER_DATA = [];
+window.LIVE_PLAYS_DATA = [];
 var emitirTicker = function() {
     var dest = document.getElementById('live-ticker');
     if (!dest) return;
@@ -24,8 +25,16 @@ var emitirTicker = function() {
         dest.innerHTML = "<span class='ticker-item'>🌐 NENHUM RESULTADO AO VIVO ENCONTRADO PARA A DATA DE HOJE NOS ESPORTES SELECIONADOS. Use ◁ ▷ nos boxes para rever a semana.</span>";
     } else {
         var str = window.LIVE_TICKER_DATA.join(" &nbsp;&nbsp;<span style='color:#00ffcc'>|</span>&nbsp;&nbsp; ");
-        // Duplicamos para o efeito visual infinito girar macio
         dest.innerHTML = "<span class='ticker-item'>" + str + "</span><span class='ticker-item'>" + str + "</span>"; 
+    }
+    
+    var playsBox = document.getElementById('live-plays');
+    if (playsBox) {
+        if (window.LIVE_PLAYS_DATA.length > 0) {
+            playsBox.innerHTML = "<marquee scrollamount='4' scrolldelay='60' class='live-play-text'>⚡ " + window.LIVE_PLAYS_DATA.join(" &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;⚡ ") + "</marquee>";
+        } else {
+            playsBox.innerHTML = "<span class='live-play-text' style='color:#888;'>Central de Lances Ociosa no momento.</span>";
+        }
     }
 };
 
@@ -50,10 +59,17 @@ var btnFs = document.getElementById('btn-fullscreen');
 if (btnFs) {
     btnFs.onclick = function() {
         var doc = document.documentElement;
-        if (doc.requestFullscreen) { doc.requestFullscreen(); }
-        else if (doc.webkitRequestFullScreen) { doc.webkitRequestFullScreen(); }
-        else if (doc.msRequestFullscreen) { doc.msRequestFullscreen(); }
-        this.style.color = '#00ffcc'; // sinaliza ativado
+        if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+            if (doc.requestFullscreen) doc.requestFullscreen();
+            else if (doc.webkitRequestFullScreen) doc.webkitRequestFullScreen();
+            else if (doc.msRequestFullscreen) doc.msRequestFullscreen();
+            this.style.color = '#00ffcc';
+        } else {
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            else if (document.msExitFullscreen) document.msExitFullscreen();
+            this.style.color = '';
+        }
     };
 }
 
@@ -152,9 +168,8 @@ var SPORTS_MAP = {
     nfl: { id: 'nfl', name: '🏈 NFL', path: 'football/nfl' },
     nhl: { id: 'nhl', name: '🏒 NHL', path: 'hockey/nhl' },
     mlb: { id: 'mlb', name: '⚾ MLB', path: 'baseball/mlb' },
-    nba: { id: 'nba', name: '🏀 NBA', path: 'basketball/nba' },
-    tenis: { id: 'tenis', name: '🎾 Tênis ATP', path: 'tennis/atp' },
-    golfe: { id: 'golfe', name: '⛳ Golfe PGA', path: 'golf/pga' }
+    pl: { id: 'pl', name: '⚽ Premiere League', path: 'soccer/eng.1' },
+    f1: { id: 'f1', name: '🏎️ Formula 1', path: 'racing/f1' }
 };
 
 var mySports = JSON.parse(localStorage.getItem('dash_sports') || '["nfl","nhl","mlb"]');
@@ -224,7 +239,8 @@ window.mudarDataEsporte = function(sportId, dif) {
 function desenharCarrosselEsportes() {
     mySports = JSON.parse(localStorage.getItem('dash_sports') || '["nfl","nhl","mlb"]');
     var track = document.getElementById('carousel-track');
-    window.LIVE_TICKER_DATA = []; // Reseta o banco do letreiro pro novo ciclo
+    window.LIVE_TICKER_DATA = [];
+    window.LIVE_PLAYS_DATA = [];
     
     if (!track) return;
     
@@ -316,18 +332,27 @@ function carregarLigaESPN(ligaCaminho, containerId, sportKey) {
                         var t1 = comp[0].team || comp[0].athlete;
                         var t2 = comp[1].team || comp[1].athlete;
                         
+                        var score1Val = parseInt(comp[0].score) || 0;
+                        var score2Val = parseInt(comp[1].score) || 0;
+                        var isPost = (jogo.status.type.state === 'post');
+                        
+                        // Determinando o Vencedor da Partida
+                        var wClass1 = "", wClass2 = "", crown1 = "", crown2 = "";
+                        if (isPost && score1Val > score2Val) { wClass1 = "winner-txt"; crown1 = "<span class='winner-crown'>👑</span>"; }
+                        if (isPost && score2Val > score1Val) { wClass2 = "winner-txt"; crown2 = "<span class='winner-crown'>👑</span>"; }
+                        
                         var img1 = t1.logo || t1.flag || "";
                         var nm1 = t1.shortDisplayName || t1.abbreviation || t1.displayName;
-                        var p1Score = comp[0].score ? "<span class='score-txt'>" + comp[0].score + "</span>" : "";
+                        var p1Score = comp[0].score ? "<span class='score-txt " + wClass1 + "'>" + comp[0].score + "</span>" : "";
                         
                         var img2 = t2.logo || t2.flag || "";
                         var nm2 = t2.shortDisplayName || t2.abbreviation || t2.displayName;
-                        var p2Score = comp[1].score ? "<span class='score-txt'>" + comp[1].score + "</span>" : "";
+                        var p2Score = comp[1].score ? "<span class='score-txt " + wClass2 + "'>" + comp[1].score + "</span>" : "";
                         
                         html += "<a href='"+lnk+"' target='_blank' class='sport-row'>";
-                        html += "  <div class='team-block t-home'><span class='team-name'>" + nm2 + "</span> " + p2Score + " <img src='"+img2+"' class='team-logo' onerror='this.style.display=\"none\"'/></div>";
+                        html += "  <div class='team-block t-home'><span class='team-name " + wClass2 + "'>" + nm2 + crown2 + "</span> " + p2Score + " <img src='"+img2+"' class='team-logo' onerror='this.style.display=\"none\"'/></div>";
                         html += "  <div class='match-info'>" + st + "</div>";
-                        html += "  <div class='team-block t-away'><img src='"+img1+"' class='team-logo' onerror='this.style.display=\"none\"'/> " + p1Score + " <span class='team-name'>" + nm1 + "</span></div>";
+                        html += "  <div class='team-block t-away'><img src='"+img1+"' class='team-logo' onerror='this.style.display=\"none\"'/> " + p1Score + " <span class='team-name " + wClass1 + "'>" + crown1 + nm1 + "</span></div>";
                         html += "</a>";
                         
                         // Abastece Letreiro ao Vivo (apenas em offset local e se nao explodiu)
@@ -337,6 +362,14 @@ function carregarLigaESPN(ligaCaminho, containerId, sportKey) {
                             // se não iniciou, mostra agenda
                             if (!comp[0].score && jogo.status.type.state==="pre") fakeScoreStr = jogo.status.type.shortDetail;
                             window.LIVE_TICKER_DATA.push(icn + " " + nm2 + " " + fakeScoreStr + " " + nm1);
+                        }
+                        
+                        // Abastece Faixa Amarela (Últimos Lances se tiver Ao Vivo)
+                        if (offset === 0 && jogo.status.type.state === 'in') {
+                            if (jogo.situation && jogo.situation.lastPlay && jogo.situation.lastPlay.text) {
+                                var shortIcn = SPORTS_MAP[sportKey].name.split(' ')[0];
+                                window.LIVE_PLAYS_DATA.push(shortIcn + " " + nm2 + " vs " + nm1 + " [" + jogo.situation.lastPlay.text + "]");
+                            }
                         }
                     } catch(e) {}
                 }
