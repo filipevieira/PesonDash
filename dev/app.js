@@ -134,7 +134,6 @@ var SPORTS_MAP = {
     nhl: { id: 'nhl', name: '🏒 NHL', path: 'hockey/nhl' },
     mlb: { id: 'mlb', name: '⚾ MLB', path: 'baseball/mlb' },
     nba: { id: 'nba', name: '🏀 NBA', path: 'basketball/nba' },
-    nbb: { id: 'nbb', name: '🏀 Basquete BR', path: 'basketball/mens-college-basketball' }, // Fallback generico
     tenis: { id: 'tenis', name: '🎾 Tênis ATP', path: 'tennis/atp' },
     golfe: { id: 'golfe', name: '⛳ Golfe PGA', path: 'golf/pga' }
 };
@@ -205,6 +204,33 @@ function carregarLigaESPN(ligaCaminho, containerId) {
             var el = document.getElementById(containerId); if(!el) return;
             if(d && d.events && d.events.length > 0) {
                 var html = "";
+                
+                // --- MOTOR ESPECIAL PARA GOLF (LEADERBOARDS) ---
+                if (ligaCaminho === 'golf/pga') {
+                    for(var i=0; i<d.events.length; i++) {
+                        try {
+                            var trny = d.events[i];
+                            html += "<div class='sport-row' style='cursor:default;'>";
+                            html += "  <div style='color:#00ffcc; font-size:14px; font-weight:bold; margin-bottom:5px;'>" + trny.shortName + " <span style='color:#888;font-size:10px;'>("+trny.status.type.shortDetail+")</span></div>";
+                            
+                            var comps = trny.competitions[0].competitors;
+                            var maxP = comps.length > 3 ? 3 : comps.length;
+                            for(var p=0; p<maxP; p++) {
+                                var ath = comps[p].athlete;
+                                var score = comps[p].score || "E";
+                                html += "  <div style='display:flex; justify-content:space-between; padding:3px 0; border-bottom:1px dashed #333;'>";
+                                html += "     <span style='color:#eee; font-size:12px; font-weight:bold;'>" + (p+1) + "º " + ath.displayName + "</span>";
+                                html += "     <span style='color:#00ffcc; font-weight:bold;'>" + score + "</span>";
+                                html += "  </div>";
+                            }
+                            html += "</div>";
+                        } catch(e) {}
+                    }
+                    el.innerHTML = html !== "" ? html : "<p style='padding:10px;'>Torneio em hiato.</p>";
+                    return; /* Interrompe para não usar o motor Time vs Time */
+                }
+
+                // --- MOTOR PADRÃO (CONFRONTOS FRONTAIS) ---
                 for(var i=0; i<d.events.length; i++) {
                     try {
                         var jogo = d.events[i];

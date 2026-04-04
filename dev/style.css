@@ -116,3 +116,18 @@ html, body {
     .match-info { width: 50%; }
     .sports-carousel .widget { width: 80%; } /* Cards 80% larg pra ver q rola pro lado */
 }
+
+/* TICKER SIDERAIWALLSTREET (BASE) */
+.ticker-wrap { position: absolute; bottom: 0; width: 100%; overflow: hidden; height: 30px; background-color: #000; padding-top: 6px; border-top: 1px dotted #333; }
+.ticker { display: inline-block; white-space: nowrap; padding-right: 100%; -webkit-animation-iteration-count: infinite; animation-iteration-count: infinite; -webkit-animation-timing-function: linear; animation-timing-function: linear; -webkit-animation-name: ticker; animation-name: ticker; -webkit-animation-duration: 50s; animation-duration: 50s; }
+.ticker-item { display: inline-block; padding: 0 40px; font-size: 13px; color: #bbb; font-family: 'Courier New', Courier, monospace; letter-spacing: 1px; font-weight: bold; }
+
+/* COMPATIBILIDADE LEGAIS DE ANDROID/APPLE */
+@-webkit-keyframes ticker { 
+    0% { -webkit-transform: translate3d(100vw, 0, 0); transform: translate3d(100vw, 0, 0); visibility: visible; } 
+    100% { -webkit-transform: translate3d(-100%, 0, 0); transform: translate3d(-100%, 0, 0); } 
+}
+@keyframes ticker { 
+    0% { -webkit-transform: translate3d(100vw, 0, 0); transform: translate3d(100vw, 0, 0); visibility: visible; } 
+    100% { -webkit-transform: translate3d(-100%, 0, 0); transform: translate3d(-100%, 0, 0); } 
+}
