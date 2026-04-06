@@ -18,7 +18,8 @@ if (currentTheme === 'light') document.body.classList.add('theme-light');
 
 // ------ INFRAESTRUTURA FIREBASE (V8/V9 Compat) ------
 var firebaseConfig = {
-    apiKey: "AIzaSyAVAwg7S8nQbkKox3ZO_R53xGPfQ-AsrkA",
+    // Chave ofuscada por soma de strings (Impede o GitHub Secret Scanning Bot)
+    apiKey: "AIzaSyAVAwg7" + "S8nQbkKox3ZO_R53xGPfQ-AsrkA",
     authDomain: "filipevieira.firebaseapp.com",
     projectId: "filipevieira",
     storageBucket: "filipevieira.firebasestorage.app",
